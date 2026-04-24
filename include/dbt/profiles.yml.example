@@ -1,0 +1,12 @@
+football_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres-data  # nome do serviço no Docker — não alterar
+      port: 5432           # porta interna do container — não alterar
+      user: airflow
+      password: airflow
+      dbname: football_db
+      schema: public
+      threads: 4
