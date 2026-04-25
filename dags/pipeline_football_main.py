@@ -1,29 +1,40 @@
 from datetime import datetime, timedelta
 from airflow.decorators import dag, task
+from airflow.operators.bash import BashOperator
+from include.football.extraction import extrair_partidas, validar_partidas
+from include.football.loading import salvar_partidas
 
 DEFAULT_ARGS = {
-    "retries": 3,
-    "retry_delay": timedelta(minutes=5),
+  "retries": 3,
+  "retry_delay": timedelta(minutes=5),
 }
 
-@dag
+
+@dag(
+  dag_id="pipeline_futebol",
+  start_date=datetime(2026, 1, 1),
+  schedule="@daily",
+  catchup=False,
+  default_args=DEFAULT_ARGS,
+    tags=["futebol", "brasileirao", "mentoria"],
+)
 def pipeline_futebol():
 
     @task
-    def extrair_partidas() -> dict:
-      pass
+    def task_extrair() -> dict:
+      return extrair_partidas()
 
     @task
-    def validar_partidas(payload: dict) -> int:
-      pass
+    def task_validar(payload: dict) -> int:
+      return validar_partidas(payload)
 
     @task
-    def salvar_partidas(payload: dict) -> None:
-      pass
+    def task_salvar(payload: dict) -> None:
+      salvar_partidas(payload)
 
-    payload = extrair_partidas()
-    validado = validar_partidas(payload)
-    salvo = salvar_partidas(payload)
+    payload = task_extrair()
+    validado = task_validar(payload)
+    salvo = task_salvar(payload)
 
     validado >> salvo
 
