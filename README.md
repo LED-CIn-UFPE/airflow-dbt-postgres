@@ -20,6 +20,40 @@ curl -sSL install.astronomer.io | sudo bash -s
 astro version  # confirmar instalação
 ```
 
+### Instalar o Astro CLI (PC do CIn)
+
+#### 1. Baixar o binário diretamente do GitHub
+
+```bash
+# Entrar na pasta temporária
+cd /tmp
+
+# Baixar a versão mais recente do Astro CLI (Linux 64-bit)
+curl -L https://github.com/astronomer/astro-cli/releases/download/v1.41.0/astro_1.41.0_linux_amd64.tar.gz -o astro.tar.gz
+
+# Extrair o conteúdo
+tar -xvzf astro.tar.gz
+```
+
+#### 2. Mover pra sua pasta local
+
+```bash
+mv astro ~/.local/bin/
+```
+
+#### 3. Configurar o path
+
+```bash
+# Adiciona a pasta ao PATH no arquivo de configuração do terminal
+echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc
+```
+
+#### 4. Testar
+
+```bash
+astro version
+```
+
 ---
 
 ## Setup
@@ -31,19 +65,7 @@ git clone <url-do-repo>
 cd airflow-dbt-postgres
 ```
 
-### 2. Configure as variáveis de ambiente
-
-```bash
-cp .env.example .env
-```
-
-Edite o `.env` e preencha com sua API key:
-
-```
-FOOTBALL_DATA_API_KEY=sua_chave_aqui
-```
-
-### 3. Configure o profiles.yml do dbt
+### 2. Configure o profiles.yml do dbt
 
 O `profiles.yml` contém as credenciais de conexão do dbt com o banco — por isso não é commitado. Crie o seu a partir do template:
 
