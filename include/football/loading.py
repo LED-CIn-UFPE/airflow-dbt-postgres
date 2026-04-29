@@ -6,14 +6,14 @@ from airflow.providers.postgres.hooks.postgres import PostgresHook
 logger = logging.getLogger(__name__)
 
 
-def salvar_partidas(payload: dict) -> None:
+def salvar_raw(payload: dict, tabela: str, chave: str) -> None:
   hook = PostgresHook(postgres_conn_id="postgres_football")
   conn = hook.get_conn()
   cursor = conn.cursor()
 
   cursor.execute("CREATE SCHEMA IF NOT EXISTS raw;")
-  cursor.execute("""
-    CREATE TABLE IF NOT EXISTS raw.matches (
+  cursor.execute(f"""
+    CREATE TABLE IF NOT EXISTS raw.{tabela} (
       id          SERIAL PRIMARY KEY,
       payload     JSONB,
       ingested_at TIMESTAMP DEFAULT NOW()
@@ -21,7 +21,7 @@ def salvar_partidas(payload: dict) -> None:
   """)
 
   cursor.execute(
-    "INSERT INTO raw.matches (payload) VALUES (%s);",
+    f"INSERT INTO raw.{tabela} (payload) VALUES (%s);",
     (json.dumps(payload),)
   )
 
@@ -29,4 +29,4 @@ def salvar_partidas(payload: dict) -> None:
   cursor.close()
   conn.close()
 
-  logger.info(f"Payload salvo com {len(payload.get('matches', []))} partidas.")
+  logger.info(f"Payload salvo em raw.{tabela} com {len(payload.get(chave, []))} registros.")

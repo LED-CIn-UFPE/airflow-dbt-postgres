@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 from airflow.decorators import dag, task
-from airflow.operators.bash import BashOperator
-from include.football.extraction import extrair_partidas, validar_partidas
-from include.football.loading import salvar_partidas
+from include.football.extraction import extrair_dados, validar_dados
+from include.football.loading import salvar_raw
 
 DEFAULT_ARGS = {
   "retries": 3,
@@ -11,26 +10,29 @@ DEFAULT_ARGS = {
 
 
 @dag(
-  dag_id="pipeline_futebol",
+  dag_id="pipeline_matches",
   start_date=datetime(2026, 1, 1),
-  schedule="@daily",
+  schedule="@weekly",
   catchup=False,
   default_args=DEFAULT_ARGS,
-    tags=["futebol", "brasileirao", "mentoria"],
+  tags=["futebol", "brasileirao", "partidas"],
 )
-def pipeline_futebol():
+def pipeline_matches():
 
     @task
     def task_extrair() -> dict:
-      return extrair_partidas()
+      return extrair_dados(
+        "/v4/competitions/BSA/matches",
+        {"season": "2026"}
+      )
 
     @task
     def task_validar(payload: dict) -> int:
-      return validar_partidas(payload)
+      return validar_dados(payload, "matches")
 
     @task
     def task_salvar(payload: dict) -> None:
-      salvar_partidas(payload)
+      salvar_raw(payload, "matches", "matches")
 
     payload = task_extrair()
     validado = task_validar(payload)
@@ -39,4 +41,4 @@ def pipeline_futebol():
     validado >> salvo
 
 
-pipeline_futebol()
+pipeline_matches()
