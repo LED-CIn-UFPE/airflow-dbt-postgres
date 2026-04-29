@@ -209,3 +209,8 @@ __marimo__/
 include/dbt/profiles.yml
 include/dbt/target/
 include/dbt/dbt_packages/
+target/
+dbt_packages/
+dbt_modules/
+logs/
+*.log

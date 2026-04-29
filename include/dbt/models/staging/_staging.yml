@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: stg_matches
+    description: "Partidas da competição, uma linha por jogo"
+    columns:
+      - name: match_id
+        description: "Identificador único da partida (fonte: API)"
+        tests:
+          - unique
+          - not_null
+      - name: match_date
+        tests:
+          - not_null
+      - name: home_team_id
+        tests:
+          - not_null
+      - name: away_team_id
+        tests:
+          - not_null
+      - name: competition_id
+        tests:
+          - not_null
+      - name: match_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['SCHEDULED', 'LIVE', 'FINISHED', 'POSTPONED', 'CANCELLED']
+
+  - name: stg_scorers
+    description: "Artilheiros da competição, uma linha por jogador"
+    columns:
+      - name: player_id
+        description: "Identificador único do jogador (fonte: API)"
+        tests:
+          - unique
+          - not_null
+      - name: goals
+        tests:
+          - not_null
+      - name: team_id
+        tests:
+          - not_null
+
+  - name: stg_standings
+    description: "Classificação geral (tipo TOTAL), uma linha por time"
+    columns:
+      - name: team_id
+        tests:
+          - unique
+          - not_null
+      - name: position
+        tests:
+          - unique
+          - not_null
+      - name: points
+        tests:
+          - not_null

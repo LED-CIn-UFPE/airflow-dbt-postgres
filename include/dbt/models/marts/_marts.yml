@@ -1,0 +1,119 @@
+version: 2
+
+models:
+  - name: dim_team
+    description: "Dimensão de times. Consolida times de partidas e artilheiros."
+    columns:
+      - name: team_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_player
+    description: "Dimensão de jogadores (artilheiros da competição)."
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+      - name: team_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_team')
+              field: team_id
+
+  - name: dim_date
+    description: "Dimensão de datas gerada a partir das partidas."
+    columns:
+      - name: date_id
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_competition
+    description: "Dimensão de competições."
+    columns:
+      - name: competition_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_matches
+    description: >
+      Fato de partidas. Grão: uma linha por partida finalizada.
+      Contém FKs para todas as dimensões e métricas de placar.
+    columns:
+      - name: match_id
+        tests:
+          - unique
+          - not_null
+      - name: date_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+      - name: home_team_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_team')
+              field: team_id
+      - name: away_team_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_team')
+              field: team_id
+      - name: competition_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_competition')
+              field: competition_id
+      - name: score_home
+        tests:
+          - not_null
+      - name: score_away
+        tests:
+          - not_null
+      - name: winner
+        tests:
+          - accepted_values:
+              values: ['HOME_TEAM', 'AWAY_TEAM', 'DRAW']
+
+  - name: fct_scorers
+    description: >
+      Fato de artilheiros. Grão: um registro por jogador na competição.
+      Contém FKs para dim_player, dim_team e dim_competition.
+    columns:
+      - name: scorer_id
+        tests:
+          - unique
+          - not_null
+      - name: player_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_player')
+              field: player_id
+      - name: team_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_team')
+              field: team_id
+      - name: competition_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_competition')
+              field: competition_id
+      - name: goals
+        tests:
+          - not_null

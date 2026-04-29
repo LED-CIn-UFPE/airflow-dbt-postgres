@@ -1,0 +1,39 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Dados brutos ingeridos da API football-data.org"
+    schema: raw
+
+    tables:
+      - name: matches
+        description: "Payload JSON com partidas da competição"
+        columns:
+          - name: payload
+            description: "JSON completo retornado pela API (campo matches)"
+            tests:
+              - not_null
+          - name: ingested_at
+            description: "Timestamp de quando o dado foi ingerido"
+            tests:
+              - not_null
+
+      - name: standings_raw
+        description: "Payload JSON com a tabela de classificação"
+        columns:
+          - name: payload
+            tests:
+              - not_null
+          - name: ingested_at
+            tests:
+              - not_null
+
+      - name: scorers_raw
+        description: "Payload JSON com artilheiros da competição"
+        columns:
+          - name: payload
+            tests:
+              - not_null
+          - name: ingested_at
+            tests:
+              - not_null
