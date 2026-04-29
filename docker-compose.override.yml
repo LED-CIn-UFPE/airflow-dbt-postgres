@@ -14,5 +14,13 @@ services:
     networks:
       - airflow
 
+  scheduler:
+    volumes:
+      - ./include:/usr/local/airflow/include:rw
+
+  triggerer:
+    volumes:
+      - ./include:/usr/local/airflow/include:rw
+
 volumes:
   postgres-data-volume:

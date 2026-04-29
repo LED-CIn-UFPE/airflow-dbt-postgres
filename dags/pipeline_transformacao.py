@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from airflow.decorators import dag, task
 from include.airflow_utils import wait_for_dag
-from include.dbt_utils import dbt_run, dbt_test
+from include.dbt_utils import dbt_run, dbt_test, dbt_deps
 
 DEFAULT_ARGS = {
   "retries": 2,
@@ -34,11 +34,16 @@ def pipeline_transformacao():
   def task_dbt_test():
     dbt_test()
 
+  @task
+  def task_dbt_deps():
+    dbt_deps()
+
+  deps = task_dbt_deps()
   staging = task_dbt_staging()
   marts = task_dbt_marts()
   test = task_dbt_test()
 
-  [wait_matches, wait_standings, wait_scorers] >> staging >> marts >> test
+  [wait_matches, wait_standings, wait_scorers] >> deps >> staging >> marts >> test
 
 
 pipeline_transformacao()
